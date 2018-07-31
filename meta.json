@@ -18,7 +18,7 @@
     "version": {
       "type": "string",
       "required": true,
-      "label": "0.0.1"
+      "label": "version"
     }
   },
   "completeMessage": "To get started:\n\n  cd {{destDirName}}\n  npm install\n  npm run dev"
