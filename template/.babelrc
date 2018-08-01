@@ -5,10 +5,14 @@
     "react"
   ],
   "plugins": [
+    "syntax-decorators",
+    "transform-decorators-legacy",
+    "transform-decorators",
     "transform-runtime",
     ["import", {
       "libraryName": "antd",
-      "libraryDirectory": "es"
+      "style": "css"
     }]
-  ]
+  ],
+  "sourceMaps": true
 }
