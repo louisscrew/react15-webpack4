@@ -1,26 +1,26 @@
-'use strict'
 const path = require('path')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const autoprefixer = require('autoprefixer');
-function resolve (dir) {
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+let outputPath = path.resolve(__dirname, "../dist");
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
 
 module.exports = {
-  context: path.resolve(__dirname, '../'),
   entry: {
-    index: ['babel-polyfill','./src/index.js']
+    main: ['babel-polyfill', './src/index.js']
   },
   output: {
-    path: path.resolve(__dirname, '../dist'),
+    path: outputPath,
     filename: '[name].[hash:8].js',
-    publicPath: '/',
     libraryTarget: 'umd',
   },
   resolve: {
-    // 自动解析文件扩展名(补全文件后缀)(从左->右)
-    // import hello from './hello'  （!hello.js? -> !hello.vue? -> !hello.json）
+    modules: [
+      "node_modules"
+    ],
     extensions: ['.js', '.jsx', '.json'],
     alias: {
       '@': resolve('src')
@@ -36,42 +36,63 @@ module.exports = {
           loader: 'babel-loader',
         }]
       },
-      // 处理node_modules中的样式问题
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader', // 回滚
+          publicPath: '../', //解决css背景图的路径问题
+          use: [{
+            loader: 'css-loader',
+            options: {
+              autoprefixer: false
+            }
+          }, {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true
+            }
+          }]
+        })
+      },
       {
         test: /\.less$/,
-        include: /node_modules/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          {
+        use: ExtractTextPlugin.extract({ //分离less编译后的css文件
+          fallback: 'style-loader',
+          publicPath: '../', //解决css背景图的路径问题
+          use: [{
+            loader: 'css-loader',
+            options: {
+              autoprefixer: false
+            }
+          }, {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [autoprefixer({ browsers: 'last 5 versions' })],
-              sourceMap: false,
-            },
-          },
-          {
-            loader: 'less-loader',
+              sourceMap: true
+            }
+          }, {
+            loader: 'less-loader'
+          }]
+        })
+      },
+      {
+        test: /\.(sass|scss)$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          publicPath: '../', //解决css背景图的路径问题
+          use: [{
+            loader: 'css-loader',
             options: {
-              javascriptEnabled: true,
-              sourceMap: false,
-            },
-          },
-        ],
-      }, {
-        test: /\.css$/,
-        include: /node_modules/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          {
+              autoprefixer: false
+            }
+          }, {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [autoprefixer({ browsers: 'last 5 versions' })],
-              sourceMap: false,
-            },
-          },
-        ],
+              sourceMap: true
+            }
+          }, {
+            loader: 'sass-loader'
+          }]
+        })
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -99,16 +120,17 @@ module.exports = {
       }
     ]
   },
-  // node: {
-  //   // prevent webpack from injecting useless setImmediate polyfill because Vue
-  //   // source contains it (although only uses it if it's native).
-  //   setImmediate: false,
-  //   // prevent webpack from injecting mocks to Node native modules
-  //   // that does not make sense for the client
-  //   dgram: 'empty',
-  //   fs: 'empty',
-  //   net: 'empty',
-  //   tls: 'empty',
-  //   child_process: 'empty'
-  // }
+  performance: {
+    hints: false
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: true // true->'head' || false->'body'
+    }),
+    new ExtractTextPlugin({
+      filename:"./css/[name].css",
+      allChunks: true
+    })
+  ]
 }
