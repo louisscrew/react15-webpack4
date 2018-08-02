@@ -23,7 +23,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     inline: true, //自动刷新
     open: false, //自动打开浏览器
     overlay: { warnings: false, errors: true }, // 在浏览器上全屏显示编译的errors或warnings。
-    quiet: false, // necessary for FriendlyErrorsPlugin // 终端输出的只有初始启动信息。 webpack 的警告和错误是不输出到终端的
+    quiet: true, // necessary for FriendlyErrorsPlugin // 终端输出的只有初始启动信息。 webpack 的警告和错误是不输出到终端的
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
