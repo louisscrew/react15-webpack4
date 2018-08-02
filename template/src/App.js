@@ -1,30 +1,23 @@
 import React, { Component } from 'react';
-import CInput from "@/components/CInput";
-import CList from "@/components/CList";
-
-import './app.css';
+import { Provider } from 'mobx-react'; //单页面 store依次传入各个组件
+import { LocaleProvider} from 'antd';
+import zhCN from 'antd/lib/locale-provider/zh_CN';
+import CommentInput from "@/components/CommentInput";
+import CommentList from "@/components/CommentList";
+import "@/app.less";
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      comments: []
+    render(){
+        return (
+            <Provider {...this.props}>
+                <LocaleProvider locale={zhCN}>
+                    <div className="wrap">
+                        <CommentInput/>
+                        <CommentList/>
+                    </div>
+                </LocaleProvider>
+            </Provider>
+        );
     }
-  }
-  handleSubmitComment(comment) {
-    this.state.comments.push(comment)
-    this.setState({
-      comments: this.state.comments
-    })
-  }
-
-  render() {
-    return (
-      <div class="wrapper">
-        <CInput onSubmit={this.handleSubmitComment.bind(this)} />
-        <CList comments={this.state.comments} />
-      </div>
-    );
-  }
-}
+} 
 export default App;
